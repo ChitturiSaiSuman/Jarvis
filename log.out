@@ -1,0 +1,9 @@
+2023-09-18:16:39:59,350 INFO     [Flow.py:105] Imported module: <module 'src.flows.Pirate_Flows' from '/home/suman/Jarvis/src/flows/Pirate_Flows.py'>
+2023-09-18:16:39:59,372 INFO     [Flow.py:105] Imported module: <module 'src.flows.Remo_Flows' from '/home/suman/Jarvis/src/flows/Remo_Flows.py'>
+2023-09-18:16:39:59,373 INFO     [app.py:55] Found flows:
+2023-09-18:16:39:59,373 INFO     [app.py:57] ('!magnet', <class 'src.flows.Pirate_Flows.MagnetDownload'>)
+2023-09-18:16:39:59,373 INFO     [app.py:57] ('!torrent_http', <class 'src.flows.Pirate_Flows.TorrentFromHTTP'>)
+2023-09-18:16:39:59,374 INFO     [app.py:57] ('!rse', <class 'src.flows.Remo_Flows.RemoteScriptExecution'>)
+2023-09-18:16:40:04,791 WARNING  [client.py:295] PyNaCl is not installed, voice will NOT be supported
+2023-09-18:16:40:04,793 INFO     [client.py:603] logging in using static token
+2023-09-18:16:40:06,586 INFO     [gateway.py:561] Shard ID None has connected to Gateway (Session ID: 05c9eacc0d3f34281af61698ea15048c).
