@@ -1,0 +1,14 @@
+{
+    "time-limit": {
+        "C": 2,
+        "CPP": 2,
+        "Java": 4,
+        "Python": 10
+    },
+    "memory-limit": {
+        "C": 1024,
+        "CPP": 1024,
+        "Java": 1024,
+        "Python": 1024
+    }
+}

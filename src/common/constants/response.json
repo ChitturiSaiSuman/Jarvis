@@ -1,0 +1,32 @@
+{
+    "general": {
+        "code": 0,
+        "foreground-color": "white",
+        "background-color": ""
+    },
+    "success": {
+        "code": 1,
+        "foreground-color": "green",
+        "background-color": ""
+    },
+    "info": {
+        "code": 2,
+        "foreground-color": "blue",
+        "background-color": ""
+    },
+    "warning": {
+        "code": 3,
+        "foreground-color": "yellow",
+        "background-color": ""
+    },
+    "error": {
+        "code": 4,
+        "foreground-color": "red",
+        "background-color": ""
+    },
+    "exception": {
+        "code": 5,
+        "foreground-color": "pink",
+        "background-color": ""
+    }
+}
