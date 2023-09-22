@@ -1,11 +1,12 @@
 import src.services.informio
 from src.common import response
+from src.services import librarian
 
-informer = src.services.informio.Informio()
+# informer = src.services.informio.Informio()
 
-resp = response.Response('info', 'Info Response')
+# resp = response.Response('info', 'Info Response')
 
-informer.send_message(resp.to_string())
+# informer.send_message(resp.to_string())
 
 #!/usr/bin/python3
 # import os
@@ -38,3 +39,4 @@ informer.send_message(resp.to_string())
 # os.system('sudo netplan apply')
 
 
+print(librarian.Librarian().upload_file('names.txt'))
