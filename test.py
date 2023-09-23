@@ -1,6 +1,7 @@
 import src.services.informio
 from src.common import response
 from src.services import librarian
+from src.flows import Librarian_Flows
 
 # informer = src.services.informio.Informio()
 
@@ -39,4 +40,29 @@ from src.services import librarian
 # os.system('sudo netplan apply')
 
 
-print(librarian.Librarian().upload_file('names.txt'))
+# obj = librarian.Librarian()
+# zip_file = obj.archive_creator('app.py', 'hello')
+
+# print(obj.tome_transporter(zip_file))
+
+locator = Librarian_Flows.FileLocator()
+
+files = locator.exec({
+    'path': "/home/suman/Music",
+    'pattern': "mp3",
+    "domain": "title"
+}).get('response')
+
+print(*enumerate(files), sep = '\n')
+
+index = int(input('pick a file:'))
+
+uploader = Librarian_Flows.FileUploader()
+
+resp = uploader.exec({
+    "path": files[index],
+    # "compress": True,
+    # "password": "ass"
+})
+
+print(resp['response'])

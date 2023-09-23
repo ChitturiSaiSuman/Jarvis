@@ -2,6 +2,7 @@ import discord, json, os
 # import services.pirate, subprocess
 import src.flows.Remo_Flows as Remo_Flows
 import src.flows.Pirate_Flows as Pirate_Flows
+import src.flows.Librarian_Flows as Librarian_Flows
 from src.services.pirate import *
 from src.common import config
 
@@ -50,12 +51,25 @@ async def on_message(message):
         # response = services.pirate.Pirate().add(file_data)
         await message.channel.send(response)
 
+    elif message.content.startswith('!locate'):
+        text = message.content
+        args = json.loads(text[7:])
+        response = Librarian_Flows.FileLocator().exec(args)['response']
+        await message.channel.send(response)
+
+    elif message.content.startswith('!upload'):
+        text = message.content
+        args = json.loads(text[7:])
+        response = Librarian_Flows.FileUploader().exec(args)['response']
+        await message.channel.send(response)
+
     elif message.content.startswith('!torrent'):
         text = message.content
         url = text.split()[1]
         response = Pirate_Flows.MagnetDownload().exec({'magnet_url': url})['response']
         # response = json.dumps(response, indent=4, default=str)
         await message.channel.send(response)
+        
     elif message.content.startswith('torrent_info'):
         response = str(Pirate().list())
         await message.channel.send(response)
