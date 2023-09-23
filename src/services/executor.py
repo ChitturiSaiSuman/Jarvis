@@ -18,13 +18,13 @@ class Executor:
             return path
         except:
             return None
-        
+
     @classmethod
     def get_timeout_perl(cls) -> str:
         return os.path.dirname(__file__)
 
     '''
-    Classes implementing the job.Job Class. 
+    Classes implementing the job.Job Class.
     Each class defines execution logic for a specific Language
     '''
 
@@ -34,7 +34,7 @@ class Executor:
         @classmethod
         def get_signature(cls) -> str:
             return "C"
-        
+
         def prepare(self, args: collections.defaultdict) -> collections.defaultdict:
             response = collections.defaultdict()
             try:
@@ -64,14 +64,14 @@ class Executor:
                 response['error'] = str(e), e.stdout, e.stderr
             except Exception as e:
                 response['error'] = str(e)
-            
+
             return response
 
         @classmethod
         def get_status(cls) -> list:
             # TODO: Implement the method
             return super().get_status()
-        
+
         @classmethod
         def purge(cls) -> bool:
             # TODO: Implement the method
@@ -83,7 +83,7 @@ class Executor:
         @classmethod
         def signature(cls) -> str:
             return "CPP"
-        
+
         def prepare(self, args: collections.defaultdict) -> collections.defaultdict:
             response = collections.defaultdict()
             try:
@@ -99,7 +99,7 @@ class Executor:
                 response['error'] = str(e)
 
             return response
-        
+
         def run(self) -> collections.defaultdict:
             response = collections.defaultdict()
             try:
@@ -113,39 +113,39 @@ class Executor:
                 response['error'] = str(e), e.stdout, e.stderr
             except Exception as e:
                 response['error'] = str(e)
-            
+
             return response
 
         @classmethod
         def get_status(cls) -> list:
             # TODO: Implement the method
             return super().get_status()
-        
+
         @classmethod
         def purge(cls) -> bool:
             # TODO: Implement the method
             return super().purge()
-        
+
     class JAVA(job.Job):
         auxiliary_data = collections.defaultdict()
 
         @classmethod
         def signature(cls) -> str:
             return "JAVA"
-        
+
         def __get_main_method_classes(self) -> list:
             def disassemble(class_file: str) -> str:
                 return subprocess.check_output(['javap', class_file], capture_output=True, text=True, cwd=self.path)
-            
+
             is_class_file = lambda file: file.suffix == '.class'
             has_main_method = lambda byte_code: 'public static void main' in byte_code
-            
+
             class_files = list(filter(is_class_file, self.target_directory.iterdir()))
             byte_codes = list(map(disassemble, class_files))
 
             main_method_classes = [class_file.stem for class_file, byte_code in zip(class_files, byte_codes) if has_main_method(byte_code)]
             return main_method_classes
-        
+
         def prepare(self, args: collections.defaultdict) -> collections.defaultdict:
             response = collections.defaultdict()
             try:
@@ -179,7 +179,7 @@ class Executor:
                 response['error'] = str(e)
 
             return response
-        
+
         def run(self) -> dict:
             response = collections.defaultdict()
             try:
@@ -193,26 +193,26 @@ class Executor:
                 response['error'] = str(e), e.stdout, e.stderr
             except Exception as e:
                 response['error'] = str(e)
-            
+
             return response
 
         @classmethod
         def get_status(cls) -> list:
             # TODO: Implement the method
             return super().get_status()
-        
+
         @classmethod
         def purge(cls) -> bool:
             # TODO: Implement the method
             return super().purge()
-        
+
     class PYTHON(job.Job):
         auxiliary_data = collections.defaultdict()
 
         @classmethod
         def signature(cls) -> str:
             return "PYTHON"
-        
+
         def prepare(self, args: collections.defaultdict) -> collections.defaultdict:
             response = collections.defaultdict()
             try:
@@ -221,7 +221,7 @@ class Executor:
             except Exception as e:
                 response['error'] = str(e)
             return response
-        
+
         def run(self) -> dict:
             response = collections.defaultdict()
             try:
@@ -235,14 +235,14 @@ class Executor:
                 response['error'] = str(e), e.stdout, e.stderr
             except Exception as e:
                 response['error'] = str(e)
-            
+
             return response
 
         @classmethod
         def get_status(cls) -> list:
             # TODO: Implement the method
             return super().get_status()
-        
+
         @classmethod
         def purge(cls) -> bool:
             # TODO: Implement the method

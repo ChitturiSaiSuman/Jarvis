@@ -51,11 +51,11 @@ class Librarian:
 
             if result.returncode != 0:
                 raise Exception(result.stderr)
-            
+
             filenames = result.stdout.splitlines()
             filepaths = list(map(os.path.normpath, filenames))
             return filepaths
-        
+
         except Exception as e:
             return str(e)
 
@@ -94,7 +94,7 @@ class Librarian:
 
         command = f"find {path_to_search} -type f -exec grep -li '{string_to_match}' {{}} + -not -path '*/.*'"
         return self.__exec(command)
-    
+
     def archive_creator(self, path_to_archive: str, password: str) -> str:
         """
         Create a zip archive of a file or folder. Optionally password protect the archive.
@@ -116,7 +116,7 @@ class Librarian:
             # Check if the path exists
             if not os.path.exists(path_to_archive):
                 raise Exception(f"Cannot find {path_to_archive}")
-            
+
             # Extract the directory and file name
             dir_name, base_name = os.path.split(path_to_archive)
 
@@ -133,7 +133,7 @@ class Librarian:
                     encryption=pyzipper.WZ_AES
                 )
                 zipf.pwd = password.encode()
-            
+
             if os.path.isdir(path_to_archive):
                 # If it's a folder, add its contents to the archive
                 for folder_root, _, files in os.walk(path_to_archive):
@@ -143,13 +143,13 @@ class Librarian:
                         zipf.write(file_path, arcname=arcname)
             else:
                 # If it's a file, add the file itself to the archive
-                zipf.write(path_to_archive, arcname=base_name)                
+                zipf.write(path_to_archive, arcname=base_name)
 
             return zip_file_path
 
         except Exception as e:
             return str(e)
-    
+
     def tome_transporter(self, file_path: str) -> str:
         """
         Upload a file to Google Drive and return a shareable link.
@@ -166,7 +166,7 @@ class Librarian:
 
         if not os.path.exists(file_path):
             raise Exception(f"Cannot find {file_path}")
-        
+
         creds = service_account.Credentials.from_service_account_file(
             self.__SERVICE_ACCOUNT_FILE,
             scopes=self.__SCOPES,
@@ -195,7 +195,7 @@ class Librarian:
             return {
                 field: file.get(field) for field in self.__FIELDS
             }
-        
+
         except Exception as e:
             return str(e)
 

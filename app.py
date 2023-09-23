@@ -37,7 +37,7 @@ def send_welcome(vars: dict):
         f'Devices on Network: \n{devices_on_network}',
         f'Current Working Directory: {os.getcwd()}'
     ])
-    
+
     resp = response.Response('general', message)
     vars['informer'].send_message(resp.to_string())
 

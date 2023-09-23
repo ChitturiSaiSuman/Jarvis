@@ -65,7 +65,7 @@ def run_bot():
     async def on_message(message):
         if message.author.bot:
             return  # Ignore messages from bots
-        
+
         if message.content.startswith('!hello'):
             await message.channel.send('Hello!')
 

@@ -10,7 +10,7 @@ def get_local_ip_address():
     try:
         # Get a list of all network interfaces
         interfaces = netifaces.interfaces()
-        
+
         # Find the interface that is connected to the router
         for interface in interfaces:
             addresses = netifaces.ifaddresses(interface)
@@ -55,13 +55,13 @@ def get_cpu_temperature():
     '''
     try:
         temperature = psutil.sensors_temperatures()
-        
+
         if 'cpu_thermal' in temperature:
             cpu_temp = temperature['cpu_thermal'][0].current
             return cpu_temp
     except:
         pass
-    
+
     return None
 
 

@@ -15,7 +15,7 @@ class Response:
 
     def to_string(self) -> str:
         return f"```ansi\n{self.art}```"
-    
+
     def __add__(self, other_response):
         if isinstance(other_response, Response):
             return Response(self.raw + other_response.art)

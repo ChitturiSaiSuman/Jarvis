@@ -49,7 +49,7 @@ class MagnetDownload(Flow):
     @classmethod
     def ps(cls) -> list:
         return cls.traces
-    
+
     @classmethod
     def purge(cls) -> bool:
         try:

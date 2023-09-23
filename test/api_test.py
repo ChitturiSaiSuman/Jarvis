@@ -32,10 +32,10 @@ filepath = 'names.txt'
 MIME_TYPE = 'text/plain'  # Example for a plain text file, adjust accordingly
 
 name = filepath.split('/')[-1]
-          
+
 # Find the MimeType of the file
 mimetype = MimeTypes().guess_type(name)[0]
-    
+
 # create file metadata
 file_metadata = {
     'name': name,
@@ -44,13 +44,13 @@ file_metadata = {
 
 try:
     media = MediaFileUpload(filepath, mimetype=mimetype)
-        
+
     # Create a new file in the Drive storage
     file = service.files().create(
         body=file_metadata, media_body=media, fields='id').execute()
-        
+
     print("File Uploaded To GDrive.")
-    
+
 except Exception as e:
     print(e)
     # Raise UploadError if file is not uploaded.

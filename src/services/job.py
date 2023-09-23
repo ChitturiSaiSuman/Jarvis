@@ -56,7 +56,7 @@ class Job:
         consolidates and sends them to the caller
         """
         response = collections.defaultdict()
-        
+
         try:
             response['Job.prepare()'] = self.prepare(args)
             response['Job.run()'] = self.run()

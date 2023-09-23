@@ -21,10 +21,10 @@ class TriggerLoader:
                 state = state.next[channel]
             if state.job:
                 raise KeyError(f"Cannot add Duplicate Trigger {trigger}")
-            
+
             state.trigger = trigger
             state.job = job
-            
+
             return f"{trigger}: {job} loaded"
 
         def fetch(self, trigger: str) -> typing.Callable:
@@ -45,7 +45,7 @@ class TriggerLoader:
                 if state.job:
                     triggers.append((state.trigger, state.job))
                 stream.extend(list(state.next.values()))
-            return triggers        
+            return triggers
 
     def __init__(self):
         loader = TriggerLoader.Swift()

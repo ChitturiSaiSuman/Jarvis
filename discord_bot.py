@@ -28,7 +28,7 @@ async def on_message(message):
     # return
     if message.author == client.user:
         return
-    
+
     # print(message.content)
 
     # if message.content in ['mine']:
@@ -69,7 +69,7 @@ async def on_message(message):
         response = Pirate_Flows.MagnetDownload().exec({'magnet_url': url})['response']
         # response = json.dumps(response, indent=4, default=str)
         await message.channel.send(response)
-        
+
     elif message.content.startswith('torrent_info'):
         response = str(Pirate().list())
         await message.channel.send(response)
@@ -78,7 +78,7 @@ async def on_message(message):
         await message.channel.send("Shutting down Jarvis...")
         # await client.close()
         os.system('sudo shutdown now')
-    
+
     elif message.content == 'restart':
         await message.channel.send('Rebooting, please wait!')
         os.system('sudo reboot')

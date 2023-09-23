@@ -4,7 +4,7 @@ from src.common import config
 class Informio:
     '''
     A tool for delivering important information or messages,
-    inspired by the Latin root "informare", 
+    inspired by the Latin root "informare",
     which means "to give shape to, to form, to instruct, to inform".
 
     Uses discord webhooks to transmit messages to specific discord channels

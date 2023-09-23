@@ -45,7 +45,7 @@ class RemoteScriptExecution(Flow):
     @classmethod
     def trigger(cls) -> str:
         return '!rse'
-    
+
     def exec(self, args: collections.defaultdict) -> dict:
         try:
             rse_obj = Remo(args)
@@ -58,11 +58,11 @@ class RemoteScriptExecution(Flow):
             return {
                 'response': str(e)
             }
-    
+
     @classmethod
     def ps(cls) -> list:
         return cls.traces
-    
+
     @classmethod
     def purge(cls) -> bool:
         try:

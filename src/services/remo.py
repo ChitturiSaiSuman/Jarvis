@@ -11,11 +11,11 @@ class Remo:
     @classmethod
     def __list_executors(cls) -> list:
         return list(filter(cls.__is_executor, inspect.getmembers(Executor)))
-    
+
     @classmethod
     def __load(cls) -> dict:
         cls.__executors = dict(cls.__list_executors())
-    
+
     def __init__(self, args: collections.defaultdict):
         Remo.__load()
         if args['lang'] not in Remo.__executors:
@@ -60,7 +60,7 @@ async def main():
 
     # asyncio.create_task(async_function(cpp_executor, args, some_function))
     # print("This should be printed immediately")
-    
+
     rse_obj = Remo(args)
     print(json.dumps(rse_obj.run(), indent=4))
 

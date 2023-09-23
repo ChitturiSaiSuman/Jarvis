@@ -15,7 +15,7 @@ class Flow(ABC):
         - ps(): Shows the current status of the flow.
         - purge(): Perform any necessary cleanup after the flow has finished.
     """
-    
+
     @classmethod
     def whoami(cls) -> str:
         """
@@ -28,7 +28,7 @@ class Flow(ABC):
             str: A descriptive string for the child class.
         """
         return textwrap.dedent(cls.__doc__)
-    
+
     @classmethod
     @abstractmethod
     def trigger(cls) -> str:
@@ -56,7 +56,7 @@ class Flow(ABC):
             NotImplementedError: If the method is not implemented by the subclass.
         """
         pass
-    
+
     @classmethod
     @abstractmethod
     def ps(cls) -> list:

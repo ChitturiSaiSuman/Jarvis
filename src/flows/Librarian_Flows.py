@@ -35,7 +35,7 @@ class FileLocator(Flow):
     @classmethod
     def trigger(cls) -> str:
         return '!locate'
-    
+
     def exec(self, args: collections.defaultdict) -> dict:
         try:
             path_to_search = args.get('path')
@@ -44,7 +44,7 @@ class FileLocator(Flow):
 
             if domain not in ['title', 'content']:
                 raise ValueError('Invalid value for domain. domain must be in ["title", "content"]')
-            
+
             lib = Librarian()
 
             if domain == 'title':
@@ -67,11 +67,11 @@ class FileLocator(Flow):
             return {
                 '': str(e)
             }
-        
+
     @classmethod
     def ps(cls) -> list:
         return cls.traces
-    
+
     @classmethod
     def purge(cls) -> bool:
         try:
@@ -79,14 +79,14 @@ class FileLocator(Flow):
             return True
         except:
             return False
-        
+
 class FileUploader(Flow):
     """
     Uploads a File to Google Drive Storage using API
 
     Trigger:
         !upload:
-    
+
     Execution Args:
         path (str): The path to the file or folder to be uploaded
         compress (bool) [True/False]: Whether to compress the file in a Zip
@@ -120,7 +120,7 @@ class FileUploader(Flow):
     @classmethod
     def trigger(cls) -> str:
         return "!upload"
-    
+
     def exec(self, args: collections.defaultdict) -> dict:
         try:
             file_path = args.get('path')
@@ -129,7 +129,7 @@ class FileUploader(Flow):
             if compress:
                 password = args.get('password', None)
                 file_path = lib.archive_creator(file_path, password)
-            
+
             fields = lib.tome_transporter(file_path)
 
             self.traces.append(file_path)
@@ -141,11 +141,11 @@ class FileUploader(Flow):
             return {
                 'error': str(e)
             }
-        
+
     @classmethod
     def ps(cls) -> list:
         return cls.traces
-    
+
     @classmethod
     def purge(cls) -> bool:
         try:

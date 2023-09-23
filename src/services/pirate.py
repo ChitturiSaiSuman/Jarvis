@@ -37,14 +37,14 @@ class Pirate:
             except Exception as e:
                 alternate_message = f'An error Occured: {e}'
                 return alternate_message
-        
+
         def __str__(self) -> str:
             try:
                 return self.get_info()
             except Exception as e:
                 alternate_message = f'An error Occured: {e}'
                 return alternate_message
-        
+
         def __repr__(self) -> str:
             try:
                 return self.__str__()
@@ -67,7 +67,7 @@ class Pirate:
         except Exception as e:
             alternate_message = f'An error Occured: {e}'
             return alternate_message
-    
+
     def add(self, torrent: typing.Union[str, bytes]) -> str:
         '''
         Adds a torrent to the download queue and begins downloading it.
@@ -82,7 +82,7 @@ class Pirate:
             str object representing the response.
         '''
         response = []
-        
+
         if isinstance(torrent, str):
             if torrent.startswith('magnet'):
                 response.append('Adding torrent from magnet URL...')
@@ -97,7 +97,7 @@ class Pirate:
         else:
             response.append('Could not add torrent. Received invalid arguments.')
             return response
-        
+
         try:
             torrent = self.client.add_torrent(torrent)
             response.append(f"Torrent {torrent.name} added")
@@ -120,7 +120,7 @@ class Pirate:
             response.append(f'Failed to remove torrent. Message: {e}')
 
         return '\n'.join(response)
-    
+
     def start(self, id: int) -> str:
         '''
         Starts torrent with provided id.
@@ -133,7 +133,7 @@ class Pirate:
             response.append(f'Failed to stop torrent. Message: {e}')
 
         return '\n'.join(response)
-    
+
     def pause(self, id: int) -> str:
         '''
         Pauses torrent with provided id.
