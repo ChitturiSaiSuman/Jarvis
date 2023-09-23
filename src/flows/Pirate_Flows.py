@@ -1,6 +1,8 @@
 import collections
+
 from src.common.Flow import Flow
 from src.services.pirate import Pirate
+
 
 class MagnetDownload(Flow):
     """
