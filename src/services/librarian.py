@@ -1,8 +1,10 @@
 import logging
 import os
 import subprocess
+import zipfile
 from mimetypes import MimeTypes
 
+import pyzipper
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -72,7 +74,7 @@ class Librarian:
             list: A list of file paths matching the search criteria.
         """
 
-        command = f"find {path_to_search} -type f -name '*{string_to_match}*' -not -path '*/.*'"
+        command = f"find {path_to_search} -iname '*{string_to_match}*' -not -path '*/.*'"
         return self.__exec(command)
 
     def content_curator(self, path_to_search: str, string_to_match: str) -> list:
@@ -92,6 +94,61 @@ class Librarian:
 
         command = f"find {path_to_search} -type f -exec grep -li '{string_to_match}' {{}} + -not -path '*/.*'"
         return self.__exec(command)
+    
+    def archive_creator(self, path_to_archive: str, password: str) -> str:
+        """
+        Create a zip archive of a file or folder. Optionally password protect the archive.
+
+        This method takes a file or folder path as input, along with a password (optional),
+        and creates a zip archive containing the specified file
+        or folder. The resulting zip file is stored in the same location as the
+        original file or folder.
+
+        Args:
+            path_to_archive (str): The path to the file or folder to be archived.
+            password (str): The password to protect the zip archive. If None, Archive will not be encrypted.
+
+        Returns:
+            str: The path to the created (password-protected) zip archive.
+        """
+
+        try:
+            # Check if the path exists
+            if not os.path.exists(path_to_archive):
+                raise Exception(f"Cannot find {path_to_archive}")
+            
+            # Extract the directory and file name
+            dir_name, base_name = os.path.split(path_to_archive)
+
+            # Construct the path for the zip archive
+            zip_file_path = os.path.join(dir_name, f"{base_name}.zip")
+
+            if password == None:
+                zipf = zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED)
+            else:
+                zipf = pyzipper.AESZipFile(
+                    zip_file_path,
+                    'w',
+                    compression=pyzipper.ZIP_DEFLATED,
+                    encryption=pyzipper.WZ_AES
+                )
+                zipf.pwd = password.encode()
+            
+            if os.path.isdir(path_to_archive):
+                # If it's a folder, add its contents to the archive
+                for folder_root, _, files in os.walk(path_to_archive):
+                    for file in files:
+                        file_path = os.path.join(folder_root, file)
+                        arcname = os.path.relpath(file_path, path_to_archive)
+                        zipf.write(file_path, arcname=arcname)
+            else:
+                # If it's a file, add the file itself to the archive
+                zipf.write(path_to_archive, arcname=base_name)                
+
+            return zip_file_path
+
+        except Exception as e:
+            return str(e)
     
     def tome_transporter(self, file_path: str) -> str:
         """
@@ -127,7 +184,7 @@ class Librarian:
         fields_to_fetch = ','.join(self.__FIELDS)
 
         try:
-            media = MediaFileUpload(file_path, mimetype=mime_type)
+            media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
 
             file = drive_service.files().create(
                 body=file_metadata,
