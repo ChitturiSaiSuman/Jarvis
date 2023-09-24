@@ -5,6 +5,7 @@ import src.flows.Pirate_Flows as Pirate_Flows
 import src.flows.Librarian_Flows as Librarian_Flows
 from src.services.pirate import *
 from src.common import config
+from src.services.informio import Informio
 
 
 client = discord.Client(intents=discord.Intents.all())
@@ -27,6 +28,12 @@ async def on_message(message):
     # await message.channel.purge()
     # return
     if message.author == client.user:
+        return
+    
+    print(message.author)
+
+    if str(message.author) == Informio().author:
+        print("Got a message from informio")
         return
 
     # print(message.content)
