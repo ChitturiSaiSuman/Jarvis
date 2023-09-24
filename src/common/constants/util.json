@@ -1,0 +1,30 @@
+{
+    "utility": {
+        "!ip": {
+            "message": "IP Address: ",
+            "callable": "get_local_ip_address"
+        },
+        "!ssid": {
+            "message": "Connected to: ",
+            "callable": "get_connected_ssid"
+        },
+        "!temperature": {
+            "message": "CPU Temperature: ",
+            "callable": "get_cpu_temperature"
+        },
+        "!wireless_siblings": {
+            "message": "Wireless Siblings:\n",
+            "callable": "discover_wireless_siblings"
+        }
+    },
+    "power": {
+        "!reboot": {
+            "message": "Restarting Jarvis. Please wait!",
+            "callable": "reboot"
+        },
+        "!shutdown": {
+            "message": "See you soon!",
+            "callable": "shutdown"
+        }
+    }
+}
