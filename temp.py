@@ -5,7 +5,7 @@ import logging
 
 from src.common.trigger_loader import TriggerLoader
 
-logging.basicConfig(level=logging.INFO, filemode='w', filename='logging.out')
+logging.basicConfig(level=logging.INFO, filemode='w', filename='log.out')
 
 TriggerLoader()
 
