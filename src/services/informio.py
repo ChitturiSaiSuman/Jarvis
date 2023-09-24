@@ -10,10 +10,10 @@ class Informio:
     Uses discord webhooks to transmit messages to specific discord channels
     '''
 
-    general_webhook_url = config.Constants.creds['webhooks']['#general']['informio']
+    def __init__(self):
+        self.webhook_url = config.Constants.creds['webhooks']['#general']['informio']['url']
+        self.author = config.Constants.creds['webhooks']['#general']['informio']['author']
 
-    def __init__(self, url=general_webhook_url):
-        self.webhook_url = url
         self.webhook = discord_webhook.DiscordWebhook(url=self.webhook_url)
 
     def send_message(self, text: str) -> None:
