@@ -19,11 +19,11 @@ logging.basicConfig(
 )
 
 def send_welcome(vars: dict):
-    ip_address = src.common.util.get_local_ip_address()
-    wifi_ssid = src.common.util.get_connected_ssid()
-    temperature = src.common.util.get_cpu_temperature()
+    ip_address = src.common.util.UTIL.get_local_ip_address()
+    wifi_ssid = src.common.util.UTIL.get_connected_ssid()
+    temperature = src.common.util.UTIL.get_cpu_temperature()
     local_time = datetime.datetime.now().strftime('%c')
-    devices_on_network = '\n'.join([f'{device}: {ip}' for device, ip in src.common.util.discover_wireless_siblings()])
+    devices_on_network = '\n'.join([f'{device}: {ip}' for device, ip in src.common.util.UTIL.discover_wireless_siblings()])
 
     message = '\n'.join([
         'Hi, Suman!',
