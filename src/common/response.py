@@ -13,7 +13,7 @@ class Response:
         artist = artificer.Artificer(self.__resp[response_type], self.raw)
         self.art = artist.touch()
 
-    def to_string(self) -> str:
+    def __str__(self) -> str:
         return f"```ansi\n{self.art}```"
 
     def __add__(self, other_response):
