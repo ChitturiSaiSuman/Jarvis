@@ -1,6 +1,15 @@
+#!/usr/bin/python3
+
 import collections
+import io
+import logging
+import time
+
+import discord
 
 from src.common.Flow import Flow
+from src.common.response import Response
+from src.services.informio import Informio
 from src.services.remo import Remo
 
 
@@ -17,7 +26,7 @@ class RemoteScriptExecution(Flow):
         time_limit (int): Time limit for the Job in seconds
         memory_limit (int): Memory limit for the Job in Kilobytes
         stdin (str): Standard input (Empty String for No input)
-        source_file (str): Name of the file to which source has to be written (Not required if lang in C, CPP, PYTHON)
+        source_file_name (str): Name of the file to which source has to be written (Not required if lang in C, CPP, PYTHON)
         path (str): Target location for Execution
 
     Raises:
@@ -51,13 +60,48 @@ class RemoteScriptExecution(Flow):
             rse_obj = Remo(args)
             response = rse_obj.run()
             self.traces.append(response)
-            return {
-                'response': response
-            }
+            return response
+        
         except Exception as e:
             return {
-                'response': str(e)
+                'status': 'error',
+                'message': str(e)
             }
+        
+    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+        acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
+        informio.send_message(str(acknowledgement))
+
+        time.sleep(1)
+
+        if message.attachments:
+            attachment = await message.attachments[0].read()
+            attachment = attachment.decode()
+            args['source'] = attachment
+        
+        resp = self.exec(args)
+
+        self.__respond_discord(resp, message, informio)
+
+    async def __respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+        
+        if resp['status'] == 'success':
+            stdout_file = discord.File(io.BytesIO(resp['stdout'].encode()), filename="stdout")
+            stderr_file = discord.File(io.BytesIO(resp['stderr'].encode()), filename="stderr")
+            files_to_upload = [stdout_file, stderr_file]
+            response = Response('success', 'Your moment of anticipation is over. Here ya go!')
+
+            await message.reply(str(response), files = files_to_upload)
+
+        else:
+            response_text = "It appears we've encountered an unexpected problem!\n"
+            response_text += '\n'.join(
+                [
+                    f'{key}: {value}' for key, value in resp.items()
+                ]
+            )
+            response = Response('error', response_text)
+            await message.reply(str(response))
 
     @classmethod
     def ps(cls) -> list:
