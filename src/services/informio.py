@@ -1,5 +1,11 @@
+#!/usr/bin/python3
+
+import logging
+
 import discord_webhook
+
 from src.common import config
+
 
 class Informio:
     '''
