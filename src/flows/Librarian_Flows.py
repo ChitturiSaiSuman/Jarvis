@@ -1,9 +1,16 @@
+#!/usr/bin/python3
+
 import collections
+import logging
 import os
+import time
+
+import discord
 
 from src.common.Flow import Flow
+from src.services.informio import Informio
 from src.services.librarian import Librarian
-
+from src.common.response import Response
 
 class FileLocator(Flow):
     """
@@ -48,25 +55,60 @@ class FileLocator(Flow):
             lib = Librarian()
 
             if domain == 'title':
-                files = lib.title_tracker(path_to_search, string_to_match)
+                response = lib.title_tracker(path_to_search, string_to_match)
             else:
-                files = lib.content_curator(path_to_search, string_to_match)
+                response = lib.content_curator(path_to_search, string_to_match)
+
+            if response['status'] == 'error':
+                return response
+            
+            files = response.get('filepaths')
 
             self.traces.append(files)
 
-            if isinstance(files, list):
-                return {
-                    'response': files
-                }
-            else:
-                return {
-                    'error': files
-                }
+            return {
+                'status': 'success',
+                'files': files
+            }
 
         except Exception as e:
             return {
-                '': str(e)
+                'status': 'error',
+                'message': str(e)
             }
+        
+    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+        acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
+        informio.send_message(str(acknowledgement))
+
+        time.sleep(1)
+
+        resp = self.exec(args)
+
+        self.__respond_discord(resp, message, informio)
+
+    async def __respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+        
+        if resp['status'] == 'success':
+            files = resp['files']
+            if files == []:
+                response = Response('info', 'No file found')
+            else:
+                response = Response('success', 'Your moment of anticipation is over. Here ya go!')
+                response += Response('info', 'Files found:')
+                response += Response('general', '\n'.join(files))
+
+            message.reply(str(response))
+
+        else:
+            response_text = "It appears we've encountered an unexpected problem!\n"
+            response_text += '\n'.join(
+                [
+                    f'{key}: {value}' for key, value in resp.items()
+                ]
+            )
+            response = Response('error', response_text)
+            await message.reply(str(response))
 
     @classmethod
     def ps(cls) -> list:
@@ -139,8 +181,14 @@ class FileUploader(Flow):
 
         except Exception as e:
             return {
-                'error': str(e)
+                'exception': str(e)
             }
+        
+    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+        pass
+
+    async def __respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+        pass
 
     @classmethod
     def ps(cls) -> list:
