@@ -1,6 +1,18 @@
-import collections, importlib, inspect, logging, os, textwrap
+#!/usr/bin/python3
+
+import collections
+import importlib
+import inspect
+import logging
+import os
+import textwrap
 from abc import ABC, abstractmethod
+
+import discord
+
 import src.flows
+from src.services.informio import Informio
+
 
 class Flow(ABC):
     """
@@ -51,6 +63,36 @@ class Flow(ABC):
 
         This method should be implemented by subclasses to define and execute
         the main logic of the flow.
+
+        Raises:
+            NotImplementedError: If the method is not implemented by the subclass.
+        """
+        pass
+
+    @abstractmethod
+    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+        """
+        Abstract method to capture flow request in Discord. The method
+        can make use of the 'message' argument and the 'informio' argument
+        to capture attachments and use them for sending appropriate responses
+
+        This method should be implemented by subclasses to enable flows
+        to capture metadata from the 'message' argument.
+
+        Raises:
+            NotImplementedError: If the method is not implemented by the subclass.
+        """
+        pass
+
+    @abstractmethod
+    async def __respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+        """
+        Abstract method to prepare the response in discord. The method
+        can make use of the 'message' argument and the 'informio' argument
+        to send different types of responses
+
+        This method should be implemented by subclasses to enable flows
+        to send responses to discord channel.
 
         Raises:
             NotImplementedError: If the method is not implemented by the subclass.
