@@ -1,5 +1,11 @@
+#!/usr/bin/python3
+
+import collections
+import re
+import logging
+
 from src.common import config
-import collections, re
+
 
 class Artificer:
     @classmethod
