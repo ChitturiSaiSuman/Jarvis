@@ -1,4 +1,9 @@
-from src.common import config, artificer
+#!/usr/bin/python3
+
+import logging
+
+from src.common import artificer, config
+
 
 class Response:
     @classmethod
@@ -18,7 +23,7 @@ class Response:
 
     def __add__(self, other_response):
         if isinstance(other_response, Response):
-            return Response(self.raw + other_response.art)
+            return Response(self.art + other_response.art)
         elif isinstance(other_response, str):
             return Response(self.raw + other_response)
         else:
