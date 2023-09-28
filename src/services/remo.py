@@ -1,7 +1,15 @@
+#!/usr/bin/python3
+
+import asyncio
+import collections
+import inspect
+import json
+import logging
+
 from src.common import config
-from src.services.job import Job
 from src.services.executor import Executor
-import asyncio, collections, inspect, json
+from src.services.job import Job
+
 
 class Remo:
     @classmethod
@@ -18,20 +26,30 @@ class Remo:
 
     def __init__(self, args: collections.defaultdict):
         Remo.__load()
+
         if args['lang'] not in Remo.__executors:
-            raise ValueError("Unidentified Executor: ", args['lang'], sep='')
+            error_message = f"Unidentified Language: {args['lang']}"
+            raise ValueError(error_message)
+
         self.lang = args['lang']
         self.args = args
 
     def run(self) -> collections.defaultdict:
         response = collections.defaultdict()
         try:
-            self.executor = Remo.__executors[self.lang]()
-            self.prep_response = self.executor.prepare(self.args)
-            self.run_response = self.executor.run()
-            response['dump'] = self.prep_response, self.run_response
+            executor = Remo.__executors[self.lang]()
+
+            prep_response = executor.prepare(self.args)
+            if prep_response['status'] == 'error':
+                return prep_response
+            
+            run_response = executor.run()
+            return run_response
+        
         except Exception as e:
-            response['error'] = str(e)
+            response['status'] = 'error'
+            response['message'] = str(e)
+            
         return response
 
 
@@ -40,18 +58,18 @@ async def async_function(executor: Job, args, last_function):
     print(executor.start(args))
     last_function()
 
-async def main():
+def main():
     # cpp_executor = executor.Executor.CPP()
-    source = open('test/code.cpp', 'r').read()
-    stdin = open('stdin', 'r').read()
+    # source = open('/home/suman/Jarvis/src/services/test.cpp', 'r').read()
+    source = "print('hello awesome')\nprint('awesome guy entered: ', int(input()))"
+
+    stdin = "7"
 
     args = {
-        'lang': 'CPP',
+        'lang': 'PYTHON',
         'path': '/home/suman/Desktop/',
         'source': source,
-        'source_file_name': 'Test.cpp',
-        'time_limit': 10,
-        'memory_limit': 10**6,
+        'source_file_name': 'Test.py',
         'stdin': stdin
     }
 
@@ -64,18 +82,18 @@ async def main():
     rse_obj = Remo(args)
     print(json.dumps(rse_obj.run(), indent=4))
 
-    source = open('test/code.c', 'r').read()
-    stdin = open('stdin', 'r').read()
+    # source = open('test/code.c', 'r').read()
+    # stdin = open('stdin', 'r').read()
 
-    args = {
-        'lang': 'C',
-        'path': '/home/suman/Desktop/',
-        'source': source,
-        'source_file_name': 'Test.cpp',
-        'time_limit': 10,
-        'memory_limit': 10**6,
-        'stdin': stdin
-    }
+    # args = {
+    #     'lang': 'C',
+    #     'path': '/home/suman/Desktop/',
+    #     'source': source,
+    #     'source_file_name': 'Test.cpp',
+    #     'time_limit': 10,
+    #     'memory_limit': 10**6,
+    #     'stdin': stdin
+    # }
 
-    rse_obj = Remo(args)
-    print(json.dumps(rse_obj.run(), indent=4))
+    # rse_obj = Remo(args)
+    # print(json.dumps(rse_obj.run(), indent=4))
