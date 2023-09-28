@@ -1,4 +1,9 @@
-import json, os
+#!/usr/bin/python3
+
+import json
+import os
+import logging
+
 
 class Constants:
     @classmethod
