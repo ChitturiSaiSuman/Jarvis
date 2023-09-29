@@ -47,7 +47,7 @@ class CommandMatrix:
                 
                 else:
                     assert state.trigger_type == 'utility'
-                    routine_message += state.job()
+                    routine_message += str(state.job())
                     response = Response('info', routine_message)
                     await message.reply(str(response))
 
