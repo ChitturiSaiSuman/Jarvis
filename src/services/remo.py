@@ -6,7 +6,7 @@ import inspect
 import json
 import logging
 
-from src.common import config
+from src.common.config import Constants
 from src.services.executor import Executor
 from src.services.job import Job
 
