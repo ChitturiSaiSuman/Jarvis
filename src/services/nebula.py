@@ -1,4 +1,10 @@
-import requests, datetime, time, logging
+#!/usr/bin/python3
+
+import datetime
+import logging
+import time
+
+import requests
 
 logging.basicConfig(filename='example.log', level=logging.DEBUG)
 
