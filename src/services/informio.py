@@ -4,7 +4,7 @@ import logging
 
 import discord_webhook
 
-from src.common import config
+from src.common.config import Constants
 
 
 class Informio:
@@ -17,8 +17,8 @@ class Informio:
     '''
 
     def __init__(self):
-        self.webhook_url = config.Constants.creds['webhooks']['#general']['informio']['url']
-        self.author = config.Constants.creds['webhooks']['#general']['informio']['author']
+        self.webhook_url = Constants.creds['webhooks']['#general']['informio']['url']
+        self.author = Constants.creds['webhooks']['#general']['informio']['author']
 
         self.webhook = discord_webhook.DiscordWebhook(url=self.webhook_url)
 
