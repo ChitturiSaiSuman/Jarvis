@@ -16,6 +16,7 @@ class Response:
         self.raw = response
         self.__resp = self.load()
         artist = artificer.Artificer(self.__resp[response_type], self.raw)
+        self.resp_type = response_type
         self.art = artist.touch()
 
     def __str__(self) -> str:
@@ -23,8 +24,9 @@ class Response:
 
     def __add__(self, other_response):
         if isinstance(other_response, Response):
-            return Response(self.art + other_response.art)
+            self.art += other_response.art
+            return self
         elif isinstance(other_response, str):
-            return Response(self.raw + other_response)
+            return Response(self.resp_type, self.raw + other_response)
         else:
             raise TypeError('Unsupported operand for +')
