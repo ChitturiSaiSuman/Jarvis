@@ -81,9 +81,9 @@ class RemoteScriptExecution(Flow):
         
         resp = self.exec(args)
 
-        self.__respond_discord(resp, message, informio)
+        await self.respond_discord(resp, message, informio)
 
-    async def __respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
         
         if resp['status'] == 'success':
             stdout_file = discord.File(io.BytesIO(resp['stdout'].encode()), filename="stdout")
