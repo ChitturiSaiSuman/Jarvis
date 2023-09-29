@@ -1,5 +1,12 @@
+#!/usr/bin/python3
+
+import collections
+import logging
+import os
+import pathlib
+import subprocess
 from abc import ABC, abstractmethod
-import collections, os, pathlib, subprocess
+
 
 class Job:
     """
