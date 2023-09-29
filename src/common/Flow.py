@@ -85,7 +85,7 @@ class Flow(ABC):
         pass
 
     @abstractmethod
-    async def __respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    async def respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
         """
         Abstract method to prepare the response in discord. The method
         can make use of the 'message' argument and the 'informio' argument
