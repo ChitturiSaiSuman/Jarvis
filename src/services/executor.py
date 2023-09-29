@@ -1,27 +1,92 @@
+#!/usr/bin/python3
+
+import collections
+import logging
+import os
+import pathlib
+import subprocess
+
+import src.common.config as config
 from src.services import job
-import collections, os, pathlib, subprocess
+
 
 class Executor:
     @classmethod
     def set_attributes(cls, obj: job.Job, args: collections.defaultdict) -> None:
         for key, value in args.items():
             setattr(obj, key, value)
-        timeout_perl = os.path.join(os.path.dirname(__file__), 'timeout.pl')
-        setattr(obj, 'timeout_perl', timeout_perl)
+
+        # Set default Time Limit and Memory Limit if not provided
+
+        if 'time_limit' not in args:
+            setattr(obj, 'time_limit', config.Constants.rse['time_limit'][obj.lang])
+            
+        if 'memory_limit' not in args:
+            setattr(obj, 'memory_limit', 1024 * config.Constants.rse['memory_limit'][obj.lang])
 
     @classmethod
-    def prepare_files(cls, job: job.Job) -> str:
+    def prepare_files(cls, job: job.Job) -> tuple:
         try:
             path = os.path.join(job.path, job.source_file_name)
             with open(path, 'w') as source_file:
                 source_file.write(job.source)
-            return path
-        except:
-            return None
+            return True, path
+        except Exception as e:
+            return False, str(e)
 
     @classmethod
     def get_timeout_perl(cls) -> str:
         return os.path.dirname(__file__)
+
+    @staticmethod
+    def prep(task: job.Job, shell_cmds: list) -> collections.defaultdict:
+        response = collections.defaultdict()
+        try:
+            process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=task.path, input=task.source, text=True)
+
+            response['status'] = 'success'
+            response['stdout'] = process.stdout
+            response['stderr'] = process.stderr
+
+        except subprocess.CalledProcessError as e:
+            response['status'] = 'error'
+            response['message'] = str(e)
+            response['stdout'] = e.stdout
+            response['stderr'] = e.stderr
+
+        except Exception as e:
+            response['status'] = 'error'
+            response['message'] = str(e)
+
+        return response
+
+    @staticmethod
+    def exec(task: job.Job, shell_cmds: list) -> collections.defaultdict:
+        response = collections.defaultdict()
+        try:
+            time_limit = str(task.time_limit)
+            memory_limit = str(task.memory_limit)
+            timeout_perl = os.path.join(os.path.dirname(__file__), 'timeout.pl')
+
+            shell_cmds = ['perl', timeout_perl, '-t', time_limit, '-m', memory_limit] + shell_cmds
+
+            process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=task.path, input=task.stdin, text=True)
+            
+            response['status'] = 'success'
+            response['stdout'] = process.stdout
+            response['stderr'] = process.stderr
+
+        except subprocess.CalledProcessError as e:
+            response['status'] = 'error'
+            response['message'] = str(e)
+            response['stdout'] = e.stdout
+            response['stderr'] = e.stderr
+
+        except Exception as e:
+            response['status'] = 'error'
+            response['message'] = str(e)
+
+        return response
 
     '''
     Classes implementing the job.Job Class.
@@ -36,37 +101,15 @@ class Executor:
             return "C"
 
         def prepare(self, args: collections.defaultdict) -> collections.defaultdict:
-            response = collections.defaultdict()
-            try:
-                Executor.set_attributes(self, args)
-                self.executable = os.path.join(self.path, 'exe')
-                shell_cmds = ['gcc', '-xc', '-', '-o', self.executable, '-lm']
-                process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, input=self.source, text=True)
-                response['compilation_log'] = process.stdout, process.stderr
-
-            except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
-            except Exception as e:
-                response['error'] = str(e)
-
-            return response
+            Executor.set_attributes(self, args)
+            self.executable = os.path.join(self.path, 'exe')
+            shell_cmds = ['gcc', '-xc', '-', '-o', self.executable, '-lm']
+            return Executor.prep(self, shell_cmds)
 
         def run(self) -> collections.defaultdict:
-            response = collections.defaultdict()
-            try:
-                time_limit = str(self.time_limit)
-                memory_limit = str(self.memory_limit)
-                shell_cmds = ['perl', self.timeout_perl, '-t', time_limit, '-m', memory_limit, self.executable]
-                process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, input=self.stdin, text=True)
-                response['execution_log'] = process.stdout, process.stderr
-
-            except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
-            except Exception as e:
-                response['error'] = str(e)
-
-            return response
-
+            shell_cmds = [self.executable]
+            return Executor.exec(self, shell_cmds)
+            
         @classmethod
         def get_status(cls) -> list:
             # TODO: Implement the method
@@ -85,36 +128,14 @@ class Executor:
             return "CPP"
 
         def prepare(self, args: collections.defaultdict) -> collections.defaultdict:
-            response = collections.defaultdict()
-            try:
-                Executor.set_attributes(self, args)
-                self.executable = os.path.join(self.path, 'exe')
-                shell_cmds = ['g++', '-std=c++17', '-Wshadow', '-Wall', '-o', self.executable, '-O2', '-Wno-unused-result', '-xc++', '-']
-                process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, input=self.source, text=True)
-                response['compilation_log'] = process.stdout, process.stderr
-
-            except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
-            except Exception as e:
-                response['error'] = str(e)
-
-            return response
+            Executor.set_attributes(self, args)
+            self.executable = os.path.join(self.path, 'exe')
+            shell_cmds = ['g++', '-std=c++17', '-Wshadow', '-Wall', '-o', self.executable, '-O2', '-Wno-unused-result', '-xc++', '-']
+            return Executor.prep(self, shell_cmds)
 
         def run(self) -> collections.defaultdict:
-            response = collections.defaultdict()
-            try:
-                time_limit = str(self.time_limit)
-                memory_limit = str(self.memory_limit)
-                shell_cmds = ['perl', self.timeout_perl, '-t', time_limit, '-m', memory_limit, self.executable]
-                process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, input=self.stdin, text=True)
-                response['execution_log'] = process.stdout, process.stderr
-
-            except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
-            except Exception as e:
-                response['error'] = str(e)
-
-            return response
+            shell_cmds = [self.executable]
+            return Executor.exec(self, shell_cmds)
 
         @classmethod
         def get_status(cls) -> list:
@@ -135,7 +156,7 @@ class Executor:
 
         def __get_main_method_classes(self) -> list:
             def disassemble(class_file: str) -> str:
-                return subprocess.check_output(['javap', class_file], capture_output=True, text=True, cwd=self.path)
+                return subprocess.check_output(['javap', class_file], text=True, cwd=self.path)
 
             is_class_file = lambda file: file.suffix == '.class'
             has_main_method = lambda byte_code: 'public static void main' in byte_code
@@ -150,14 +171,21 @@ class Executor:
             response = collections.defaultdict()
             try:
                 Executor.set_attributes(self, args)
-                source_file = Executor.prepare_files(self)
+                created, output = Executor.prepare_files(self)
 
-                self.current_directory = pathlib.Path.cwd()
+                if not created:
+                    response['status'] = 'error'
+                    response['message'] = output
+                    return response
+
                 self.target_directory = pathlib.Path(self.path)
 
-                shell_cmds = ['javac', source_file]
+                shell_cmds = ['javac', output]
                 process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, text=True)
-                response['compilation_log'] = process.stdout, process.stderr
+
+                response['status'] = 'success'
+                response['stdout'] = process.stdout
+                response['stderr'] = process.stderr
 
                 if process.returncode != 0:
                     return response
@@ -165,36 +193,33 @@ class Executor:
                     main_method_classes = self.__get_main_method_classes()
                     if len(main_method_classes) == 1:
                         self.main_class = main_method_classes[0]
-                        response['Identified Main Class'] = str(self.main_class)
+                        response['Main Class'] = str(self.main_class)
                     else:
+                        response.clear()
                         if len(main_method_classes) == 0:
-                            response['error'] = 'No main methods found'
+                            response['status'] = 'error'
+                            response['message'] = 'No main methods found'
                         elif len(main_method_classes) > 1:
-                            response['error'] = 'Multiple main methods found'
+                            response['status'] = 'error'
+                            response['message'] = 'Multiple main methods found'
+
                         return response
 
             except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
+                response['status'] = 'error'
+                response['message'] = str(e)
+                response['stdout'] = e.stdout
+                response['stderr'] = e.stderr
+
             except Exception as e:
-                response['error'] = str(e)
+                response['status'] = 'error'
+                response['message'] = str(e)
 
             return response
 
         def run(self) -> dict:
-            response = collections.defaultdict()
-            try:
-                time_limit = str(self.time_limit)
-                memory_limit = str(self.memory_limit)
-                shell_cmds = ['perl', self.timeout_perl, '-t', time_limit, '-m', memory_limit, 'java', '-cp', self.path, self.main_class]
-                process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, input=self.stdin, text=True)
-                response['execution_log'] = process.stdout, process.stderr
-
-            except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
-            except Exception as e:
-                response['error'] = str(e)
-
-            return response
+            shell_cmds = ['java', '-cp', self.path, self.main_class]
+            return Executor.exec(self, shell_cmds)
 
         @classmethod
         def get_status(cls) -> list:
@@ -217,26 +242,15 @@ class Executor:
             response = collections.defaultdict()
             try:
                 Executor.set_attributes(self, args)
-                response['log'] = 'ready'
+                response['status'] = 'success'
             except Exception as e:
-                response['error'] = str(e)
+                response['status'] = 'error'
+                response['message'] = str(e)
             return response
 
         def run(self) -> dict:
-            response = collections.defaultdict()
-            try:
-                time_limit = str(self.time_limit)
-                memory_limit = str(self.memory_limit)
-                shell_cmds = ['perl', self.timeout_perl, '-t', time_limit, '-m', memory_limit, 'python3', '-c', self.source]
-                process = subprocess.run(shell_cmds, capture_output=True, check=True, cwd=self.path, input=self.stdin, text=True)
-                response['execution_log'] = process.stdout, process.stderr
-
-            except subprocess.CalledProcessError as e:
-                response['error'] = str(e), e.stdout, e.stderr
-            except Exception as e:
-                response['error'] = str(e)
-
-            return response
+            shell_cmds = ['python3', '-c', self.source]
+            return Executor.exec(self, shell_cmds)
 
         @classmethod
         def get_status(cls) -> list:
