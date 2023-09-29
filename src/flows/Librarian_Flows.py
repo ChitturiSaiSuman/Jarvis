@@ -85,9 +85,9 @@ class FileLocator(Flow):
 
         resp = self.exec(args)
 
-        self.__respond_discord(resp, message, informio)
+        await self.respond_discord(resp, message, informio)
 
-    async def __respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
         
         if resp['status'] == 'success':
             files = resp['files']
@@ -98,8 +98,6 @@ class FileLocator(Flow):
                 response += Response('info', 'Files found:')
                 response += Response('general', '\n'.join(files))
 
-            message.reply(str(response))
-
         else:
             response_text = "It appears we've encountered an unexpected problem!\n"
             response_text += '\n'.join(
@@ -108,7 +106,8 @@ class FileLocator(Flow):
                 ]
             )
             response = Response('error', response_text)
-            await message.reply(str(response))
+            
+        await message.reply(str(response))
 
     @classmethod
     def ps(cls) -> list:
@@ -187,7 +186,7 @@ class FileUploader(Flow):
     async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
         pass
 
-    async def __respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    async def respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
         pass
 
     @classmethod
