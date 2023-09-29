@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+
+import logging
 import re
 import subprocess
 
@@ -115,7 +118,21 @@ class UTIL:
         return []
     
     @staticmethod
-    def shutdown_system():
+    def reboot():
+        '''
+        Reboots the system.
+
+        Returns:
+            bool: True if the restart command was successful, False otherwise.
+        '''
+        try:
+            subprocess.run(["sudo", "reboot"])
+            return True
+        except subprocess.CalledProcessError:
+            return False
+    
+    @staticmethod
+    def shutdown():
         '''
         Shuts down the system.
 
@@ -124,20 +141,6 @@ class UTIL:
         '''
         try:
             subprocess.run(["sudo", "shutdown", "-h", "now"])
-            return True
-        except subprocess.CalledProcessError:
-            return False
-
-    @staticmethod
-    def restart_system():
-        '''
-        Restarts the system.
-
-        Returns:
-            bool: True if the restart command was successful, False otherwise.
-        '''
-        try:
-            subprocess.run(["sudo", "reboot"])
             return True
         except subprocess.CalledProcessError:
             return False
