@@ -1,5 +1,13 @@
 {
     "utility": {
+        "!local_time": {
+            "message": "Local Time: ",
+            "callable": "get_local_time"
+        },
+        "!cwd": {
+            "message": "Current Working Directory: ",
+            "callable": "get_current_working_directory"
+        },
         "!ip": {
             "message": "IP Address: ",
             "callable": "get_local_ip_address"
