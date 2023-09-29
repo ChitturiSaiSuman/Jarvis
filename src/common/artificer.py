@@ -4,13 +4,13 @@ import collections
 import re
 import logging
 
-from src.common import config
+from src.common.config import Constants
 
 
 class Artificer:
     @classmethod
     def load(cls) -> dict:
-        return config.Constants.chroma
+        return Constants.chroma
 
     def __construct(self, text: str):
         self.nOiCe= f"\u001b[{self.format};{self.bg_color};{self.fg_color}m{text}\u001b[0;0m"
