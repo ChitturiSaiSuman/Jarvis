@@ -1,4 +1,13 @@
-import collections, json, time, transmission_rpc, typing, os
+#!/usr/bin/python3
+
+import collections
+import os
+import typing
+
+from src.common.config import Constants
+
+import transmission_rpc
+
 
 class Pirate:
     '''
@@ -10,10 +19,10 @@ class Pirate:
         '''
         A class to store information of a torrent.
         '''
-        def __init__(self, torrent: transmission_rpc.torrent.Torrent) -> None:
+        def __init__(self, torrent: transmission_rpc.torrent.Torrent):
             self.torrent = torrent
 
-        def get_info(self) -> str:
+        def get_info(self) -> dict:
             '''
             Returns information of a torrent.
             '''
@@ -24,51 +33,70 @@ class Pirate:
                     'Name': torrent.name,
                     'Status': torrent.status,
                     'Progress': torrent.progress,
-                    'Download Speed': torrent.rate_download / 10**6,
-                    'Upload Speed': torrent.rate_upload / 10**6,
+                    'Download Speed (KB/s)': torrent.rate_download / 1024,
+                    'Upload Speed (KB/s)': torrent.rate_upload / 1024,
                     'Seeders': torrent.peers_connected,
-                    'ETA': None,
-                    'Total Size': round(torrent.total_size / 10**6),
+                    'Total Size (MB)': round(torrent.total_size / 10**6),
                     'Error': torrent.error,
                     'Error String': torrent.error_string,
                     'ETA': torrent.eta
                 })
-                return json.dumps(info, indent=4, default=str)
+                
+                return {
+                    'status': 'success',
+                    'info': info
+                }
+            
             except Exception as e:
-                alternate_message = f'An error Occured: {e}'
-                return alternate_message
+                return {
+                    'status': 'error',
+                    'message': str(e)
+                }
 
         def __str__(self) -> str:
-            try:
-                return self.get_info()
-            except Exception as e:
-                alternate_message = f'An error Occured: {e}'
-                return alternate_message
+            response = self.get_info()
+            if response['status'] == 'error':
+                return response['message']
+            
+            return '\n'.join(
+                [
+                    f'{key}: {value}' for key, value in response['info'].items()
+                ]
+            )
 
         def __repr__(self) -> str:
-            try:
-                return self.__str__()
-            except Exception as e:
-                alternate_message = f'An error Occured: {e}'
-                return alternate_message
+            return self.__str__()
 
-    def __init__(self, host='localhost', port=9091, username='transmission', password='transmission'):
+    def __init__(self):
+        host = Constants.pirate['host']
+        port = Constants.pirate['port']
+        username = Constants.pirate['username']
+        password = Constants.pirate['password']
         self.client = transmission_rpc.Client(host=host, port=port, username=username, password=password)
 
-    def list(self) -> str:
+    def list(self) -> dict:
         '''
         Returns info of all active torrents.
         '''
         try:
             torrents = self.client.get_torrents()
-            if torrents == []:
-                return 'No torrents found!'
-            return '\n'.join(list(map(str, map(Pirate.TorrentInfo, torrents))))
-        except Exception as e:
-            alternate_message = f'An error Occured: {e}'
-            return alternate_message
+            sep = '\n' + '*' * 64 + '\n'
+            torrents = sep.join(
+                list(map(str, map(Pirate.TorrentInfo, torrents)))
+            )
 
-    def add(self, torrent: typing.Union[str, bytes]) -> str:
+            return {
+                'status': 'success',
+                'message': torrents
+            }
+        
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
+
+    def add(self, torrent: typing.Union[str, bytes]) -> dict:
         '''
         Adds a torrent to the download queue and begins downloading it.
 
@@ -79,73 +107,98 @@ class Pirate:
                 3. bytes object representing torrent info
 
         Returns:
-            str object representing the response.
+            dict object representing the response.
         '''
-        response = []
+
+        message = ""
 
         if isinstance(torrent, str):
             if torrent.startswith('magnet'):
-                response.append('Adding torrent from magnet URL...')
+                message = 'Adding torrent from magnet URL...'
+
             elif torrent.startswith('http'):
-                response.append('Adding torrent from HTTP URL...')
+                message = 'Adding torrent from HTTP URL...'
+
             elif os.path.exists(torrent):
-                response.append('Adding torrent from file...')
+                message = 'Adding torrent from file...'
+
+            else:
+                message = 'Could not add torrent. Received invalid arguments.'
 
         elif isinstance(torrent, bytes):
-            response.append('Adding torrent from torrent file data...')
+            message = 'Adding torrent from torrent file data...'
 
         else:
-            response.append('Could not add torrent. Received invalid arguments.')
-            return response
+            message = 'Could not add torrent. Received invalid arguments.'
 
         try:
             torrent = self.client.add_torrent(torrent)
-            response.append(f"Torrent {torrent.name} added")
+            ack = f'Torrent {torrent.name} added Successfully!'
+            return {
+                'status': 'success',
+                'message': message + '\n' + ack
+            }
 
-        except transmission_rpc.TransmissionError as e:
-            message = f'Failed to add torrent. Message: {e}'
-            response.append(message)
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
+            
 
-        return '\n'.join(response)
-
-    def remove(self, id: int, delete_data=False) -> str:
+    def remove(self, id: int, delete_data=False) -> dict:
         '''
         Removes torrent with provided id. Local data is deleted if delete_data is True.
         '''
-        response = []
+
         try:
             self.client.remove_torrent(id, delete_data=delete_data)
-            response.append(f'Removed torrent with id {id} successfully')
+            return {
+                'status': 'success',
+                'message': f'Removed torrent with id {id} successfully!'
+            }
+        
         except Exception as e:
-            response.append(f'Failed to remove torrent. Message: {e}')
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
 
-        return '\n'.join(response)
-
-    def start(self, id: int) -> str:
+    def start(self, id: int) -> dict:
         '''
         Starts torrent with provided id.
         '''
-        response = []
+
         try:
             self.client.start_torrent(id)
-            response.append(f'Started torrent with id {id} successfully')
+            return {
+                'status': 'success',
+                'message': f'Started torrent with id {id} successfully'
+            }
+        
         except Exception as e:
-            response.append(f'Failed to stop torrent. Message: {e}')
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
 
-        return '\n'.join(response)
-
-    def pause(self, id: int) -> str:
+    def pause(self, id: int) -> dict:
         '''
         Pauses torrent with provided id.
         '''
-        response = []
+
         try:
             self.client.stop_torrent(id)
-            response.append(f'Stopped torrent with id {id} successfully')
+            return {
+                'status': 'success',
+                'message': f'Stopped torrent with id {id} successfully'
+            }
+        
         except Exception as e:
-            response.append(f'Failed to stop torrent. Message: {e}')
-
-        return '\n'.join(response)
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
 
 
 if __name__ == '__main__':
