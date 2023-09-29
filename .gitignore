@@ -1,4 +1,5 @@
 src/common/constants/creds.json
 src/common/constants/librarian.json
+src/common/constants/pirate.json
 **/__pycache__
 log.out

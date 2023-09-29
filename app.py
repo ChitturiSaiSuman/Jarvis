@@ -39,7 +39,7 @@ def send_welcome(vars: dict):
     ])
 
     resp = response.Response('general', message)
-    vars['informer'].send_message(resp.to_string())
+    vars['informer'].send_message(str(resp))
 
 def init():
     vars = {
