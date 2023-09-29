@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
+import datetime
 import logging
+import os
 import re
 import subprocess
 
@@ -10,6 +12,47 @@ import psutil
 
 
 class UTIL:
+
+    @staticmethod
+    def get_local_time():
+        '''
+        Get the current local time and return it as a formatted string.
+    
+        This method retrieves the current local time using the `datetime` module,
+        formats it according to the '%c' format string, and returns the formatted
+        time as a string.
+
+        Returns:
+            str: A string representing the current local time in a human-readable format.
+
+        Example:
+            >>> local_time = MyClass.get_local_time()
+            >>> print(local_time)
+            'Mon Sep 29 15:48:03 2023'
+        '''
+        local_time = datetime.datetime.now().strftime('%c')
+        return local_time
+
+    @staticmethod
+    def get_current_working_directory():
+        '''
+        Get the current working directory as a string.
+
+        This method returns the absolute pathname of the current working directory
+        of the process. The current working directory is the directory in which
+        the Python script is currently executing.
+
+        Returns:
+            str: A string representing the absolute path of the current working directory.
+
+        Example:
+            >>> cwd = MyClass.get_current_working_directory()
+            >>> print(cwd)
+            '/path/to/current/directory'        
+        '''
+        return os.getcwd()
+    
+
     @staticmethod
     def get_local_ip_address():
         '''
@@ -111,7 +154,8 @@ class UTIL:
                     device_ip = port_scanner[host]['addresses']['ipv4']
                     devices.append((device_name, device_ip))
 
-            return sorted(devices, key=lambda pair: pair[1])
+            return '\n'.join([f'{device}: {ip}' for device, ip in sorted(devices, key=lambda pair: pair[1])])
+        
         except:
             pass
 
