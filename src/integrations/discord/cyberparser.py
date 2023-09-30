@@ -36,38 +36,44 @@ class CyberParser:
         command, content = re.split(r'\s+', message.strip(), 1)
         signature = dict()
 
-        if content.startswith('{') and content.endswith('}'):
-            try:
-                json_body = json.loads(content)
-                signature['king'] = 'flow'
-                signature['command'] = command
-                signature['args'] = json_body
-            
-            except json.JSONDecodeError as e:
-                signature['kind'] = 'error'
-                signature['message'] = str(e)
-                
-        else:
-            content_lines = content.splitlines()
-            pairs = []
-            for line in content_lines:
-                match = re.match(r'(\w+)\s*[:=]\s*(.*)', line)
-                if match:
-                    key, value = match.groups()
-                    value = json.loads(f"[{value}]")[0]
-                    pairs.append((key, value))
-                else:
-                    pairs = []
-                    break
+        try:
 
-            if pairs:
-                body = dict(pairs)
-                signature['kind'] = 'flow'
-                signature['command'] = command
-                signature['args'] = body
-            
+            if content.startswith('{') and content.endswith('}'):
+                try:
+                    json_body = json.loads(content)
+                    signature['king'] = 'flow'
+                    signature['command'] = command
+                    signature['args'] = json_body
+                
+                except json.JSONDecodeError as e:
+                    signature['kind'] = 'error'
+                    signature['message'] = str(e)
+                    
             else:
-                signature['kind'] = 'error'
-                signature['message'] = 'Unable to decode pairs'
+                content_lines = content.splitlines()
+                pairs = []
+                for line in content_lines:
+                    match = re.match(r'(\w+)\s*[:=]\s*(.*)', line)
+                    if match:
+                        key, value = match.groups()
+                        value = json.loads(f"[{value}]")[0]
+                        pairs.append((key, value))
+                    else:
+                        pairs = []
+                        break
+
+                if pairs:
+                    body = dict(pairs)
+                    signature['kind'] = 'flow'
+                    signature['command'] = command
+                    signature['args'] = body
+                
+                else:
+                    signature['kind'] = 'error'
+                    signature['message'] = 'Unable to decode pairs'
+
+        except Exception as e:
+            signature['kind'] = 'error'
+            signature['message'] = str(e)
 
         return signature
