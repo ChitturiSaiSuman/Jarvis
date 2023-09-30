@@ -54,6 +54,7 @@ class CyberParser:
                 match = re.match(r'(\w+)\s*[:=]\s*(.*)', line)
                 if match:
                     key, value = match.groups()
+                    value = json.loads(f"[{value}]")[0]
                     pairs.append((key, value))
                 else:
                     pairs = []

@@ -169,25 +169,56 @@ class FileUploader(Flow):
             lib = Librarian()
             if compress:
                 password = args.get('password', None)
-                file_path = lib.archive_creator(file_path, password)
+                resp = lib.archive_creator(file_path, password)
+            
+            if resp['status'] == 'error':
+                return resp
 
-            fields = lib.tome_transporter(file_path)
+            response = lib.tome_transporter(resp['zip_file_path'])
+            self.traces.append(response)
 
-            self.traces.append(file_path)
-            return {
-                'response': fields
-            }
+            return response
 
         except Exception as e:
             return {
-                'exception': str(e)
+                'status': 'error',
+                'message': str(e)
             }
         
     async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
-        pass
+        acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
+        informio.send_message(str(acknowledgement))
 
-    async def respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
-        pass
+        time.sleep(1)
+
+        resp = self.exec(args)
+
+        await self.respond_discord(resp, message, informio)
+
+    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+        
+        if resp['status'] == 'success':
+            response = Response('success', 'Your moment of anticipation is over. Here ya go!')
+            response += Response('info', 'File has been uploaded\n')
+            
+            file_id = resp['id']
+            web_content_link = resp['webContentLink']
+            web_view_link = resp['webViewLink']
+
+            response += Response('general', f"File ID: {file_id}")
+            response += Response('general', f"Download link: {web_content_link}")
+            response += Response('general', f"View Link: {web_view_link}")
+
+        else:
+            response_text = "It appears we've encountered an unexpected problem!\n"
+            response_text += '\n'.join(
+                [
+                    f'{key}: {value}' for key, value in resp.items()
+                ]
+            )
+            response = Response('error', response_text)
+
+        await message.reply(str(response))
 
     @classmethod
     def ps(cls) -> list:
