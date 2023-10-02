@@ -164,17 +164,20 @@ class FileUploader(Flow):
 
     def exec(self, args: collections.defaultdict) -> dict:
         try:
+            lib = Librarian()
+
             file_path = args.get('path')
             compress = os.path.isdir(file_path) or args.get('compress')
-            lib = Librarian()
+            
             if compress:
                 password = args.get('password', None)
                 resp = lib.archive_creator(file_path, password)
-            
-            if resp['status'] == 'error':
-                return resp
+                if resp['status'] == 'error':
+                    return resp
+                response = lib.tome_transporter(resp['zip_file_path'])
+            else:    
+                response = lib.tome_transporter(file_path)
 
-            response = lib.tome_transporter(resp['zip_file_path'])
             self.traces.append(response)
 
             return response
