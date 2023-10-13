@@ -8,8 +8,6 @@ import os
 import textwrap
 from abc import ABC, abstractmethod
 
-import discord
-
 import src.flows
 from src.services.informio import Informio
 
@@ -70,7 +68,7 @@ class Flow(ABC):
         pass
 
     @abstractmethod
-    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    def capture_discord(self, args: collections.defaultdict, informio: Informio):
         """
         Abstract method to capture flow request in Discord. The method
         can make use of the 'message' argument and the 'informio' argument
@@ -85,7 +83,7 @@ class Flow(ABC):
         pass
 
     @abstractmethod
-    async def respond_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    def respond_discord(self, args: collections.defaultdict, informio: Informio):
         """
         Abstract method to prepare the response in discord. The method
         can make use of the 'message' argument and the 'informio' argument
