@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 
 import collections
-import logging
-
-import discord, time
+import time
 
 from src.common.Flow import Flow
+from src.common.response import Response
 from src.services.informio import Informio
 from src.services.pirate import Pirate
-from src.common.response import Response
 
 
 class Torrent(Flow):
@@ -122,22 +120,21 @@ class Torrent(Flow):
 
         return resp
     
-    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    def capture_discord(self, args: collections.defaultdict, informio: Informio):
         acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
         informio.send_message(str(acknowledgement))
 
         time.sleep(1)
 
-        if message.attachments:
-            torrent = await message.attachments[0].read()
-            args['torrent'] = torrent
+        if args['attachment']:
+            args['torrent'] = args['attachment']
 
         resp = self.exec(args)
 
-        await self.respond_discord(resp, message, informio)
+        self.respond_discord(resp, informio)
 
 
-    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+    def respond_discord(self, resp: collections.defaultdict, informio: Informio):
         
         if resp['status'] == 'success':
             response = Response('success', 'Your moment of anticipation is over. Here ya go!')
@@ -152,7 +149,7 @@ class Torrent(Flow):
             )
             response = Response('error', response_text)
 
-        await message.reply(str(response))
+        informio.send_message(str(response))
 
     @classmethod
     def ps(cls) -> list:

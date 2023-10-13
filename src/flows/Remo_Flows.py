@@ -2,7 +2,6 @@
 
 import collections
 import io
-import logging
 import time
 
 import discord
@@ -68,22 +67,20 @@ class RemoteScriptExecution(Flow):
                 'message': str(e)
             }
         
-    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    def capture_discord(self, args: collections.defaultdict, informio: Informio):
         acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
         informio.send_message(str(acknowledgement))
 
         time.sleep(1)
 
-        if message.attachments:
-            attachment = await message.attachments[0].read()
-            attachment = attachment.decode()
-            args['source'] = attachment
+        if args['attachment']:
+            args['source'] = args['attachment']
         
         resp = self.exec(args)
 
-        await self.respond_discord(resp, message, informio)
+        self.respond_discord(resp, informio)
 
-    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+    def respond_discord(self, resp: collections.defaultdict, informio: Informio):
         
         if resp['status'] == 'success':
             stdout_file = discord.File(io.BytesIO(resp['stdout'].encode()), filename="stdout")
@@ -91,7 +88,7 @@ class RemoteScriptExecution(Flow):
             files_to_upload = [stdout_file, stderr_file]
             response = Response('success', 'Your moment of anticipation is over. Here ya go!')
 
-            await message.reply(str(response), files = files_to_upload)
+            informio.send_message(str(response), files=files_to_upload)
 
         else:
             response_text = "It appears we've encountered an unexpected problem!\n"
@@ -101,7 +98,7 @@ class RemoteScriptExecution(Flow):
                 ]
             )
             response = Response('error', response_text)
-            await message.reply(str(response))
+            informio.send_message(str(response))
 
     @classmethod
     def ps(cls) -> list:

@@ -1,16 +1,14 @@
 #!/usr/bin/python3
 
 import collections
-import logging
 import os
 import time
 
-import discord
-
 from src.common.Flow import Flow
+from src.common.response import Response
 from src.services.informio import Informio
 from src.services.librarian import Librarian
-from src.common.response import Response
+
 
 class FileLocator(Flow):
     """
@@ -77,7 +75,7 @@ class FileLocator(Flow):
                 'message': str(e)
             }
         
-    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    def capture_discord(self, args: collections.defaultdict, informio: Informio):
         acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
         informio.send_message(str(acknowledgement))
 
@@ -85,9 +83,9 @@ class FileLocator(Flow):
 
         resp = self.exec(args)
 
-        await self.respond_discord(resp, message, informio)
+        self.respond_discord(resp, informio)
 
-    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+    def respond_discord(self, resp: collections.defaultdict, informio: Informio):
         
         if resp['status'] == 'success':
             files = resp['files']
@@ -106,8 +104,8 @@ class FileLocator(Flow):
                 ]
             )
             response = Response('error', response_text)
-            
-        await message.reply(str(response))
+
+        informio.send_message(str(response))
 
     @classmethod
     def ps(cls) -> list:
@@ -188,7 +186,7 @@ class FileUploader(Flow):
                 'message': str(e)
             }
         
-    async def capture_discord(self, args: collections.defaultdict, message: discord.Message, informio: Informio):
+    def capture_discord(self, args: collections.defaultdict, informio: Informio):
         acknowledgement = Response('success', f'{self.trigger()} request has been captured. Please wait!')
         informio.send_message(str(acknowledgement))
 
@@ -196,9 +194,9 @@ class FileUploader(Flow):
 
         resp = self.exec(args)
 
-        await self.respond_discord(resp, message, informio)
+        self.respond_discord(resp, informio)
 
-    async def respond_discord(self, resp: collections.defaultdict, message: discord.Message, informio: Informio):
+    def respond_discord(self, resp: collections.defaultdict, informio: Informio):
         
         if resp['status'] == 'success':
             response = Response('success', 'Your moment of anticipation is over. Here ya go!')
@@ -221,7 +219,7 @@ class FileUploader(Flow):
             )
             response = Response('error', response_text)
 
-        await message.reply(str(response))
+        informio.send_message(str(response))
 
     @classmethod
     def ps(cls) -> list:
