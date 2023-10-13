@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import logging
+import multiprocessing
 
 import discord
 
@@ -20,41 +20,56 @@ class CommandMatrix:
         content = message.content
         signature = self.cyber_parser.parse(content)
 
-        if signature['kind'] == 'empty':
-            response = Response('warning', signature['message'])
+        if signature["kind"] == "empty":
+            response = Response("warning", signature["message"])
             await message.reply(response)
-        
-        elif signature['kind'] == 'error':
-            response = Response('error', signature['message'])
+
+        elif signature["kind"] == "error":
+            response = Response("error", signature["message"])
             await message.reply(str(response))
 
         else:
-            if signature['kind'] == 'general':
-                ping_from_user = signature['message']
+            if signature["kind"] == "general":
+                ping_from_user = signature["message"]
                 # TODO
                 # Implement a ChatBot that will have the context of
                 # previous general messages and responds accordingly
-                response = Response('general', f'Got message {ping_from_user}')
+                response = Response(
+                    "general", f"Got message {ping_from_user}"
+                )
                 self.informio.send_message(str(response))
 
-            elif signature['kind'] == 'util':
-                state, routine_message = self.trigger_loader.fetch(signature['command'])
+            elif signature["kind"] == "util":
+                state, routine_message = self.trigger_loader.fetch(
+                    signature["command"]
+                )
 
-                if state.trigger_type == 'power':
-                    response = Response('warning', routine_message)
+                if state.trigger_type == "power":
+                    response = Response("warning", routine_message)
                     await message.reply(str(response))
                     state.job()
-                
+
                 else:
-                    assert state.trigger_type == 'utility'
+                    assert state.trigger_type == "utility"
                     routine_message += str(state.job())
-                    response = Response('info', routine_message)
+                    response = Response("info", routine_message)
                     await message.reply(str(response))
 
             else:
-                assert signature['kind'] == 'flow'
-                command = signature['command']
-                args = signature['args']
-                
+                assert signature["kind"] == "flow"
+                command = signature["command"]
+                args = signature["args"]
+
+                if message.attachments:
+                    args["attachment"] = await message.attachments[
+                        0
+                    ].read()
+
                 state, _ = self.trigger_loader.fetch(command)
-                await state.job().capture_discord(args, message, self.informio)
+
+                # Spawn a new process that doesn't interrupt with the state of bot
+                process = multiprocessing.Process(
+                    target=state.job().capture_discord,
+                    args=(args, self.informio),
+                )
+                process.start()
