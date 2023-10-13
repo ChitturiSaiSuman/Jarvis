@@ -28,7 +28,7 @@ class Informio:
             url=self.webhook_url
         )
 
-    def send_message(self, text: str, files: list) -> None:
+    def send_message(self, text: str, files=[]) -> None:
         """
         Delivers a message to the general channel on discord
         """
