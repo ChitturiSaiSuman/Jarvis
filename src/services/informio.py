@@ -34,12 +34,8 @@ class Informio:
         """
         self.webhook.content = text
 
-        for file_path in files:
-            with open(file_path, "rb") as file:
-                self.webhook.add_file(
-                    file=file.read(),
-                    filename=os.path.basename(file_path),
-                )
+        for file, filename in files:
+            self.webhook.add_file(file=file, filename=filename)
 
         self.webhook.execute()
 

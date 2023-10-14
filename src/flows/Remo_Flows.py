@@ -83,9 +83,10 @@ class RemoteScriptExecution(Flow):
     def respond_discord(self, resp: collections.defaultdict, informio: Informio):
         
         if resp['status'] == 'success':
-            stdout_file = discord.File(io.BytesIO(resp['stdout'].encode()), filename="stdout")
-            stderr_file = discord.File(io.BytesIO(resp['stderr'].encode()), filename="stderr")
-            files_to_upload = [stdout_file, stderr_file]
+            files_to_upload = [
+                (io.BytesIO(resp['stdout'].encode()), 'stdout'),
+                (io.BytesIO(resp['stderr'].encode()), 'stderr')
+            ]
             response = Response('success', 'Your moment of anticipation is over. Here ya go!')
 
             informio.send_message(str(response), files=files_to_upload)
