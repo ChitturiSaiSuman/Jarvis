@@ -126,7 +126,7 @@ class Torrent(Flow):
 
         time.sleep(1)
 
-        if args['attachment']:
+        if 'attachment' in args:
             args['torrent'] = args['attachment']
 
         resp = self.exec(args)

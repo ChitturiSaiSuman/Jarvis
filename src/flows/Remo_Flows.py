@@ -73,7 +73,7 @@ class RemoteScriptExecution(Flow):
 
         time.sleep(1)
 
-        if args['attachment']:
+        if 'attachment' in args:
             args['source'] = args['attachment']
         
         resp = self.exec(args)

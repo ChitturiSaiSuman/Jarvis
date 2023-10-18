@@ -2,6 +2,7 @@
 
 import json
 import re
+import collections
 
 from src.common.trigger_loader import TriggerLoader
 
@@ -63,7 +64,7 @@ class CyberParser:
                         break
 
                 if pairs:
-                    body = dict(pairs)
+                    body = collections.defaultdict(lambda: None, dict(pairs))
                     signature['kind'] = 'flow'
                     signature['command'] = command
                     signature['args'] = body
