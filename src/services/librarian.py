@@ -9,7 +9,7 @@ from mimetypes import MimeTypes
 import pyzipper
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 from src.common.config import Constants
 
@@ -223,7 +223,67 @@ class Librarian:
                 'status': 'error',
                 'message': str(e)
             }
+        
+    def download_file(self, file_id, index):
+        try:
 
+            destination_path = f'/home/suman/{index}.tar.gz'
+            log_file = f'/home/suman/{index}.txt'
+            log_file = open(log_file, 'w')
+
+            creds = service_account.Credentials.from_service_account_file(
+                self.__SERVICE_ACCOUNT_FILE,
+                scopes=self.__SCOPES,
+            )
+
+            drive_service = build('drive', 'v3', credentials=creds)
+
+            request = drive_service.files().get_media(fileId=file_id)
+            fh = open(destination_path, 'wb')
+            downloader = MediaIoBaseDownload(fh, request)
+
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
+                log_file.write(str(status.progress()) + '\n')
+                log_file.flush()
+
+            log_file.write(str(done) + '\n')
+            log_file.flush()
+
+            fh.close()
+
+            some_return = {
+                'status': 'success',
+                'message': f'The file has been downloaded to {destination_path}'
+            }
+
+            log_file.write(str(some_return) + '\n')
+            log_file.flush()
+
+            log_file.close()
+
+            return some_return
+
+        except Exception as e:
+            err_return = {
+                'status': 'error',
+                'message': str(e)
+            }
+            log_file.write(str(err_return) + '\n')
+            log_file.flush()
+            log_file.close()
+            return err_return
+
+
+def download():
+    ids = [
+        '1OLuIG-va1tjcsxrbbXIoBz2ZUs82cGMt',
+        '1esUcTV78FaCwxc-tiEfPmzps494dDZGj',
+        '15ul6WGaOu3Jqwg6pQqae-fSCJv3P-FEr'
+    ]
+    for index, file_id in enumerate(ids):
+        print(Librarian().download_file(file_id, index))
 
 if __name__ == '__main__':
     print(Librarian().title_tracker('/home/suman/', 'pirate'))
