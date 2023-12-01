@@ -277,11 +277,7 @@ class Librarian:
 
 
 def download():
-    ids = [
-        '1OLuIG-va1tjcsxrbbXIoBz2ZUs82cGMt',
-        '1esUcTV78FaCwxc-tiEfPmzps494dDZGj',
-        '15ul6WGaOu3Jqwg6pQqae-fSCJv3P-FEr'
-    ]
+    ids = []
     for index, file_id in enumerate(ids):
         print(Librarian().download_file(file_id, index))
 
