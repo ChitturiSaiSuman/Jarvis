@@ -1,7 +1,7 @@
 # Jarvis
 Everything you need in a Machine
 
-<details open>
+<details closed>
 <summary>Setup</summary>
 
 * Clone the Repository
