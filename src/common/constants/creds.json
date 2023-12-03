@@ -1,0 +1,25 @@
+{
+    "webhooks": {
+        "#general": {
+            "informio": {
+                "author": "<AUTHOR>",
+                "url": "<DISCORD-WEBHOOK-URL>"
+            }
+        }
+    },
+    "jarvis": {
+        "bot": {
+            "token": "<BOT_TOKEN>"
+        }
+    },
+    "librarian": {
+        "json-key-file": "src/common/constants/librarian.json",
+        "folder-id": "<GOOGLE_DRIVE_FOLDER_ID>",
+        "scopes": ["https://www.googleapis.com/auth/drive"],
+        "fields": [
+            "id",
+            "webContentLink",
+            "webViewLink"
+        ]
+    }
+}
