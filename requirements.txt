@@ -1,8 +1,8 @@
 discord_webhook
-python-nmap
-psutil
 discord.py
-pyzipper
-google-auth
 google-api-python-client
+google-auth
+psutil
+python-nmap
+pyzipper
 transmission-rpc
