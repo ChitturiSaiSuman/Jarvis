@@ -22,6 +22,8 @@ class Flow(ABC):
     Subclasses inheriting from this class must implement the following abstract methods:
         - trigger(): Shows the method execution trigger (typically a !message for discord)
         - exec(): Execute the main logic of the flow.
+        - capture_discord(): Capture flow request in Discord.
+        - respond_discord(): Prepare the response in Discord.
         - ps(): Shows the current status of the flow.
         - purge(): Perform any necessary cleanup after the flow has finished.
     """
