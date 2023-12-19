@@ -17,16 +17,9 @@ class Informio:
     """
 
     def __init__(self):
-        self.webhook_url = Constants.creds["webhooks"]["#general"][
-            "informio"
-        ]["url"]
-        self.author = Constants.creds["webhooks"]["#general"][
-            "informio"
-        ]["author"]
-
-        self.webhook = discord_webhook.DiscordWebhook(
-            url=self.webhook_url
-        )
+        self.webhook_url = Constants.creds["webhooks"]["#general"]["informio"]["url"]
+        self.author = Constants.creds["webhooks"]["#general"]["informio"]["author"]
+        self.webhook = discord_webhook.DiscordWebhook(url=self.webhook_url)
 
     def send_message(self, text: str, files=[]) -> None:
         """
