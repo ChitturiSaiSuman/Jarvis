@@ -46,22 +46,22 @@ class Torrent(Flow):
 
     Example Args:
         1.
-            !pirate
+            !torrent
             task = list
         2.
-            !pirate
+            !torrent
             task = add
             url = magnet:?xt=urn:btih:c8bb8c7e50bbae9bc9599639e835c0117f0c7e3d&dn=example.torrent
         3.
-            !pirate
+            !torrent
             task = add
             url = https://<torrent_link>.torrent
         4.
-            !pirate
+            !torrent
             task = add
             # Add an attachment
         5.
-            !pirate         !pirate         !pirate
+            !torrent         !torrent         !torrent
             task = stop     task = start    task = pause
             id = 1          id = 2          id = 4
 
@@ -128,6 +128,7 @@ class Torrent(Flow):
 
         if 'attachment' in args:
             args['torrent'] = args['attachment']
+            args.pop('attachment')
 
         resp = self.exec(args)
 
