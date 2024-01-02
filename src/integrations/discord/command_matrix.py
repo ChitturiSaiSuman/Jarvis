@@ -61,9 +61,7 @@ class CommandMatrix:
                 args = signature["args"]
 
                 if message.attachments:
-                    args["attachment"] = await message.attachments[
-                        0
-                    ].read()
+                    args["attachment"] = await message.attachments[0].read()
 
                 state, _ = self.trigger_loader.fetch(command)
 
