@@ -1,5 +1,6 @@
 {
     "user": "Suman",
     "greeting": "Greetings, my friend! I hope you're having a fantastic day.\nI'm here and ready to assist with anything you need.\n",
-    "comment": "Here are few things that describe my current state\n"
+    "comment": "Here are few things that describe my current state\n",
+    "log": "log.out"
 }
