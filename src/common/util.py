@@ -5,16 +5,19 @@ import logging
 import os
 import re
 import subprocess
+import traceback
+from io import TextIOWrapper
 
 import netifaces
 import nmap
 import psutil
 
+from src.common.config import Constants
 
 class UTIL:
 
     @staticmethod
-    def get_local_time():
+    def get_local_time() -> dict:
         '''
         Get the current local time and return it as a formatted string.
     
@@ -30,8 +33,18 @@ class UTIL:
             >>> print(local_time)
             'Mon Sep 29 15:48:03 2023'
         '''
-        local_time = datetime.datetime.now().strftime('%c')
-        return local_time
+        try:
+            local_time = datetime.datetime.now().strftime('%c')
+            return {
+                'status': 'success',
+                'message': local_time
+            }
+        
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
 
     @staticmethod
     def get_current_working_directory():
@@ -50,7 +63,17 @@ class UTIL:
             >>> print(cwd)
             '/path/to/current/directory'        
         '''
-        return os.getcwd()
+        try:
+            return {
+                'status': 'success',
+                'message': os.getcwd()
+            }
+        
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
     
 
     @staticmethod
@@ -62,6 +85,7 @@ class UTIL:
             str or None: The IP address of the machine if found, or None if unable to retrieve the IP address.
         '''
         try:
+            ip = None
             # Get a list of all network interfaces
             interfaces = netifaces.interfaces()
 
@@ -71,12 +95,19 @@ class UTIL:
                 if netifaces.AF_INET in addresses:
                     ip_address = addresses[netifaces.AF_INET][0]['addr']
                     if ip_address != '127.0.0.1':
-                        return ip_address
+                        ip = ip_address
+                        break
 
-        except (OSError, KeyError):
-            pass
+            return {
+                'status': 'success',
+                'message': ip
+            }
 
-        return None
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
     
     @staticmethod
     def get_connected_ssid():
@@ -93,11 +124,18 @@ class UTIL:
             # Use regular expressions to extract the SSID from the output
             match = re.search(r'ESSID:"([^"]+)"', output)
             if match:
-                return match.group(1)
-        except subprocess.CalledProcessError:
-            pass
+                ssid = match.group(1)
 
-        return None
+            return {
+                'status': 'success',
+                'message': ssid
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
     
     @staticmethod
     def get_cpu_temperature():
@@ -112,11 +150,17 @@ class UTIL:
 
             if 'cpu_thermal' in temperature:
                 cpu_temp = temperature['cpu_thermal'][0].current
-                return cpu_temp
-        except:
-            pass
-
-        return None
+                
+            return {
+                'status': 'success',
+                'message': cpu_temp
+            }
+            
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
     
     @staticmethod
     def discover_wireless_siblings():
@@ -154,12 +198,45 @@ class UTIL:
                     device_ip = port_scanner[host]['addresses']['ipv4']
                     devices.append((device_name, device_ip))
 
-            return '\n'.join([f'{device}: {ip}' for device, ip in sorted(devices, key=lambda pair: pair[1])])
+            return {
+                'status': 'success',
+                'message': '\n'.join([f'{device}: {ip}' for device, ip in sorted(devices, key=lambda pair: pair[1])])
+            }
         
-        except:
-            pass
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
+        
+    @staticmethod
+    def get_log(N=10) -> str:
+        '''
+        Retrieves the last N lines from the Jarvis application log file.
 
-        return []
+        This method reads the Jarvis application log file, which is managed by the Python logging module,
+        and retrieves the last N lines. The log file contains information about system events, errors,
+        and other diagnostic messages logged during the operation of the Jarvis application.
+
+        Returns:
+            str: A string containing the last N lines from the Jarvis application log file.
+
+        Note:
+            The log file is assumed to be managed by the Python logging module. The specific location and
+            format of the log file may be configured in the application's logging setup.
+        '''
+        try:
+            log_file = TextIOWrapper(open(Constants['log']))
+            return {
+                'status': 'success',
+                'message': log_file.readlines()[-N:]
+            }
+        
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': traceback.format_exc()
+            }
     
     @staticmethod
     def reboot():

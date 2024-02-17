@@ -2,11 +2,12 @@
 
 import collections
 import os
+import traceback
 import typing
 
-from src.common.config import Constants
-
 import transmission_rpc
+
+from src.common.config import Constants
 
 
 class Pirate:
@@ -49,7 +50,7 @@ class Pirate:
                 return {"status": "success", "info": info}
 
             except Exception as e:
-                return {"status": "error", "message": str(e)}
+                return {"status": "error", "message": traceback.format_exc()}
 
         def __str__(self) -> str:
             response = self.get_info()
@@ -84,7 +85,7 @@ class Pirate:
             return {"status": "success", "message": torrents}
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def add(self, torrent: typing.Union[str, bytes]) -> dict:
         """
@@ -127,7 +128,7 @@ class Pirate:
             return {"status": "success", "message": message + "\n" + ack}
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def remove(self, id: int, delete_data=False) -> dict:
         """
@@ -142,7 +143,7 @@ class Pirate:
             }
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def start(self, id: int) -> dict:
         """
@@ -157,7 +158,7 @@ class Pirate:
             }
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def pause(self, id: int) -> dict:
         """
@@ -172,7 +173,7 @@ class Pirate:
             }
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
 
 if __name__ == "__main__":

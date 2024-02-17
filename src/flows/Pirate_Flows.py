@@ -2,6 +2,7 @@
 
 import collections
 import time
+import traceback
 
 from src.common.Flow import Flow
 from src.common.response import Response
@@ -115,7 +116,7 @@ class Torrent(Flow):
         except Exception as e:
             resp = {
                 'status': 'error',
-                'message': str(e)
+                'message': traceback.format_exc()
             }
 
         return resp

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import collections
+import traceback
 from abc import ABC, abstractmethod
 
 
@@ -64,7 +65,7 @@ class Job:
             response['Job.prepare()'] = self.prepare(args)
             response['Job.run()'] = self.run()
         except Exception as e:
-            response['error'] = str(e)
+            response['error'] = traceback.format_exc()
 
         return response
 

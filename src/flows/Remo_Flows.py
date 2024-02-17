@@ -3,8 +3,7 @@
 import collections
 import io
 import time
-
-import discord
+import traceback
 
 from src.common.Flow import Flow
 from src.common.response import Response
@@ -64,7 +63,7 @@ class RemoteScriptExecution(Flow):
         except Exception as e:
             return {
                 'status': 'error',
-                'message': str(e)
+                'message': traceback.format_exc()
             }
         
     def capture_discord(self, args: collections.defaultdict, informio: Informio):

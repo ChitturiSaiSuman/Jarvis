@@ -3,6 +3,7 @@
 import logging
 import os
 import subprocess
+import traceback
 import zipfile
 from mimetypes import MimeTypes
 
@@ -79,10 +80,10 @@ class Librarian:
             return {"status": "success", "filepaths": filepaths}
 
         except subprocess.CalledProcessError as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def title_tracker(self, path_to_search: str, string_to_match: str) -> dict:
         """
@@ -183,7 +184,7 @@ class Librarian:
             return {"status": "success", "zip_file_path": zip_file_path}
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def tome_transporter(self, file_path: str) -> dict:
         """
@@ -227,7 +228,7 @@ class Librarian:
             }
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def enumerate_collection(self) -> dict:
         """
@@ -276,7 +277,7 @@ class Librarian:
             return {"status": "success", "files": files}
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def snap_remote(self, file_id: str) -> dict:
         """
@@ -313,7 +314,7 @@ class Librarian:
             }
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def purge_remote(self) -> dict:
         """
@@ -364,7 +365,7 @@ class Librarian:
             return {"status": "success", "message": "All files removed successfully."}
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
     def clone_to_local(self, file_id: str, destination: str) -> dict:
         """
@@ -425,7 +426,7 @@ class Librarian:
             }
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "message": traceback.format_exc()}
 
 
 if __name__ == "__main__":

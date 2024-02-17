@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import subprocess
+import traceback
 
 import src.common.config as config
 from src.services import job
@@ -32,7 +33,7 @@ class Executor:
                 source_file.write(job.source)
             return True, path
         except Exception as e:
-            return False, str(e)
+            return False, traceback.format_exc()
 
     @classmethod
     def get_timeout_perl(cls) -> str:
@@ -50,13 +51,13 @@ class Executor:
 
         except subprocess.CalledProcessError as e:
             response['status'] = 'error'
-            response['message'] = str(e)
+            response['message'] = traceback.format_exc()
             response['stdout'] = e.stdout
             response['stderr'] = e.stderr
 
         except Exception as e:
             response['status'] = 'error'
-            response['message'] = str(e)
+            response['message'] = traceback.format_exc()
 
         return response
 
@@ -78,13 +79,13 @@ class Executor:
 
         except subprocess.CalledProcessError as e:
             response['status'] = 'error'
-            response['message'] = str(e)
+            response['message'] = traceback.format_exc()
             response['stdout'] = e.stdout
             response['stderr'] = e.stderr
 
         except Exception as e:
             response['status'] = 'error'
-            response['message'] = str(e)
+            response['message'] = traceback.format_exc()
 
         return response
 
@@ -207,13 +208,13 @@ class Executor:
 
             except subprocess.CalledProcessError as e:
                 response['status'] = 'error'
-                response['message'] = str(e)
+                response['message'] = traceback.format_exc()
                 response['stdout'] = e.stdout
                 response['stderr'] = e.stderr
 
             except Exception as e:
                 response['status'] = 'error'
-                response['message'] = str(e)
+                response['message'] = traceback.format_exc()
 
             return response
 
@@ -245,7 +246,7 @@ class Executor:
                 response['status'] = 'success'
             except Exception as e:
                 response['status'] = 'error'
-                response['message'] = str(e)
+                response['message'] = traceback.format_exc()
             return response
 
         def run(self) -> dict:

@@ -3,6 +3,7 @@
 import collections
 import os
 import time
+import traceback
 
 from src.common.Flow import Flow
 from src.common.response import Response
@@ -72,7 +73,7 @@ class FileLocator(Flow):
         except Exception as e:
             return {
                 'status': 'error',
-                'message': str(e)
+                'message': traceback.format_exc()
             }
         
     def capture_discord(self, args: collections.defaultdict, informio: Informio):
@@ -183,7 +184,7 @@ class FileUploader(Flow):
         except Exception as e:
             return {
                 'status': 'error',
-                'message': str(e)
+                'message': traceback.format_exc()
             }
         
     def capture_discord(self, args: collections.defaultdict, informio: Informio):

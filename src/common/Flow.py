@@ -6,6 +6,7 @@ import inspect
 import logging
 import os
 import textwrap
+import traceback
 from abc import ABC, abstractmethod
 
 import src.flows
@@ -130,14 +131,14 @@ class Flow(ABC):
     @classmethod
     def discover_descendants(cls) -> list:
         package = src.flows.__package__
-        is_module = lambda module: module.endswith('.py')
-        modules = filter(is_module, os.listdir(package.replace('.', '/')))
-        modules = map(lambda module: module.replace('.py', ''), modules)
+        is_module = lambda module: module.endswith(".py")
+        modules = filter(is_module, os.listdir(package.replace(".", "/")))
+        modules = map(lambda module: module.replace(".py", ""), modules)
 
         descendants = []
 
         for module in modules:
-            module = f'{package}.{module}'
+            module = f"{package}.{module}"
             try:
                 module = importlib.import_module(module)
                 for name, obj in inspect.getmembers(module):
@@ -146,9 +147,12 @@ class Flow(ABC):
 
                 logging.info(f"Imported module: {module}")
             except ImportError as e:
-                logging.error(f"Failed to import module {module}: {str(e)}")
+                logging.error(
+                    f"Failed to import module {module}: {traceback.format_exc()}"
+                )
 
         return descendants
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print(Flow.discover_descendants())

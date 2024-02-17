@@ -5,6 +5,7 @@ import collections
 import inspect
 import json
 import logging
+import traceback
 
 from src.common.config import Constants
 from src.services.executor import Executor
@@ -48,7 +49,7 @@ class Remo:
         
         except Exception as e:
             response['status'] = 'error'
-            response['message'] = str(e)
+            response['message'] = traceback.format_exc()
             
         return response
 
