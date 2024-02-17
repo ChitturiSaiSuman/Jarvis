@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
+import collections
 import json
 import re
-import collections
+import traceback
 
 from src.common.trigger_loader import TriggerLoader
 
@@ -48,7 +49,7 @@ class CyberParser:
                 
                 except json.JSONDecodeError as e:
                     signature['kind'] = 'error'
-                    signature['message'] = str(e)
+                    signature['message'] = traceback.format_exc()
                     
             else:
                 content_lines = content.splitlines()
@@ -75,6 +76,6 @@ class CyberParser:
 
         except Exception as e:
             signature['kind'] = 'error'
-            signature['message'] = str(e)
+            signature['message'] = traceback.format_exc()
 
         return signature
